@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+# My own LDA Function:
 lda_function = function(data,data_labels){
   # This function contains the univariate version of the LDA function.
   # We need a few things in order to estimate the mean of each class, shared variance, and prior probabilities.
@@ -74,6 +75,57 @@ lda_function = function(data,data_labels){
 ```
 
 
+
+```{r}
+# The following is code written by my professor, Dr. Tang
+univariate_lda_scratch = function(data, class_labels) {
+  
+  N = length(class_labels)  # Number of observations
+  
+  unique_classes = unique(class_labels) 
+  num_classes = length(unique_classes)  # Number of classes
+  
+  pi_hat = numeric(num_classes)  # Store the class's sample prior probability
+  mu_hat = numeric(num_classes)  # Store the class's sample mean
+  sigma_hat = numeric(1)  # Store the pooled (common) sample variance of classes
+  
+  for (k in 1:num_classes) {
+    class_k = unique_classes[k]
+    Nk = sum(class_labels == class_k)  # Get the number of observations for each class
+    
+    # Estimate prior probability πˆk
+    pi_hat[k] = Nk / N
+    
+    # Estimate mean µˆk
+    mu_hat[k] = mean(data[class_labels == class_k])
+    
+    # Estimate common variance σˆ for two classes
+    for (i in 1:N) {
+      if (class_labels[i] == class_k) {
+        xi_minus_mu = data[i] - mu_hat[k]
+        sigma_hat = sigma_hat + xi_minus_mu^2
+      }
+    }
+  }
+  sigma_hat = sigma_hat / (N - num_classes)
+  
+  # Calculate discriminant function values
+  discriminants = matrix(0, nrow = N, ncol = num_classes)
+  for (i in 1:N) {
+    for (k in 1:num_classes) {
+      discriminants[i, k] = data[i] * (1 / sigma_hat) * mu_hat[k] - (1 / (2 * sigma_hat)) * (mu_hat[k]^2) + log(pi_hat[k])
+    }
+  }
+  
+  # Make class decisions for all data points
+  predicted_classes = apply(discriminants, 1, which.max)
+  
+  return(predicted_classes)
+}
+```
+
+
+
 ```{r}
 # Test the function:
 credit = read.table("SouthGermanCredit.asc",header=TRUE)
@@ -81,10 +133,16 @@ head(credit)
 data = credit$laufzeit #laufzeit means duration
 data_labels = credit$kredit #kredit means credit_risk
 
+# Testing my own LDA Function:
 predicted_labels = lda_function(data,data_labels)
 head(predicted_labels)
 
 # Calculate the MSE
+mean((data_labels - predicted_labels)^2)
+
+# Comparing to professor's code
+predicted_labels = univariate_lda_scratch(data,data_labels)
+head(predicted_labels)
 mean((data_labels - predicted_labels)^2)
 ```
 
