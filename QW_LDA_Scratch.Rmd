@@ -9,11 +9,67 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-lda_function = function(){
-  # This function contains the univariate data of 
+lda_function = function(data,data_labels){
+  # This function contains the univariate version of the LDA function.
+  # We need a few things in order to estimate the mean of each class, shared variance, and prior probabilities.
   
+  #n = number of data points there are total
+  n = length(data_labels)
   
+  classes = unique(data_labels)
+  num_classes = length(classes)
   
+  # Initialize mean of each classes, shared variance, and prior probabilities
+  mu_hat = numeric(num_classes)
+  pi_hat = numeric(num_classes)
+  variance = numeric(1)
+  variance[1] = 0
+  sum_xs = numeric(1)
+  sum_xs[1] = 0
+  
+  # Find the mean and prior probability of each class:
+  for (k in 1:num_classes){
+    n_k = sum(data_labels == classes[k])
+    
+    pi_hat[k] = n_k/n
+    
+    sum_xs[1] = 0
+    for (i in 1:n){
+      if (data_labels[i] == classes[k]){
+        sum_xs = sum_xs + data[i]
+      }
+    }
+    mu_hat[k] = sum_xs/n_k
+  }
+  
+  # Find the shared variance:
+  for (k in 1:num_classes){
+    for (i in 1:n){
+      if (data_labels[i] == classes[k]){
+        data_minus_mean = data[i] - mu_hat[k]
+        dmm_squared = data_minus_mean^2
+        variance = variance + dmm_squared
+      }
+    }
+  }
+  variance = variance/(n-num_classes)
+  
+  # Plug into the discriminant function to generate predicted labels
+  discriminants = matrix(0,nrow = n,ncol = num_classes)
+  
+  for (k in 1:num_classes){
+    for (i in 1:n){
+      x = data[i]
+      discriminants[i,k] = (x * (mu_hat[k]/variance)) - ((mu_hat[k]^2)/(2*variance)) + log(pi_hat[k])
+    }
+  }
+  
+  # Go row by row in the "discriminants" matrix and identify the max value per row (which class has the larger discriminant)
+  # The predicted label is the class with the larger discriminant.
+  predicted_labels = apply(discriminants,1,which.max)
+    
+    
+  return(predicted_labels)
 }
 ```
 
