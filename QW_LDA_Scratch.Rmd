@@ -74,6 +74,19 @@ lda_function = function(data,data_labels){
 ```
 
 
+```{r}
+# Test the function:
+credit = read.table("SouthGermanCredit.asc",header=TRUE)
+head(credit)
+data = credit$laufzeit #laufzeit means duration
+data_labels = credit$kredit #kredit means credit_risk
+
+predicted_labels = lda_function(data,data_labels)
+head(predicted_labels)
+
+# Calculate the MSE
+mean((data_labels - predicted_labels)^2)
+```
 
 
 
