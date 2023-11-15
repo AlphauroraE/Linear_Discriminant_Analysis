@@ -1,0 +1,51 @@
+---
+title: "QW_LDA_Scratch"
+output: html_document
+date: "2023-11-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+lda_function = function(){
+  # This function contains the univariate data of 
+  
+  
+  
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
