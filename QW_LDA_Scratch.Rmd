@@ -77,7 +77,7 @@ lda_function = function(data,data_labels){
 
 
 ```{r}
-# The following is code written by my professor, Dr. Tang
+# The following is code written by my professor
 univariate_lda_scratch = function(data, class_labels) {
   
   N = length(class_labels)  # Number of observations
